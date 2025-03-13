@@ -25,8 +25,7 @@ let productSchema = mongoose.Schema({
         default:"",
     },
     category:{
-        type:mongoose.Types.ObjectId,
-        ref:'category',
+        type:String,
         required:true
     },
     isDeleted:{

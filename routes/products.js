@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 let productModel = require('../schemas/products')
-let categoryModel = require('../schemas/category')
 let {CreateErrorRes,
   CreateSuccessRes} = require('../utils/responseHandler')
 
@@ -9,7 +8,7 @@ let {CreateErrorRes,
 router.get('/', async function(req, res, next) {
   let products = await productModel.find({
     isDeleted:false
-  }).populate("category")
+  })
   CreateSuccessRes(res,products,200);
 });
 router.get('/:id', async function(req, res, next) {
@@ -17,30 +16,25 @@ router.get('/:id', async function(req, res, next) {
     let product = await productModel.findOne({
       _id:req.params.id, isDeleted:false
     }
+      
     )
     CreateSuccessRes(res,product,200);
   } catch (error) {
     next(error)
   }
+  
 });
 router.post('/', async function(req, res, next) {
   try {
     let body = req.body
-    let category = await categoryModel.findOne({
-      name:body.category
+    let newProduct = new productModel({
+      name:body.name,
+      price:body.price,
+      quantity:body.quantity,
+      category:body.category
     })
-    if(category){
-      let newProduct = new productModel({
-        name:body.name,
-        price:body.price,
-        quantity:body.quantity,
-        category:category._id
-      })
-      await newProduct.save();
-      CreateSuccessRes(res,newProduct,200);
-    }else{
-      throw new Error("cate khong ton tai")
-    } 
+    await newProduct.save();
+    CreateSuccessRes(res,newProduct,200);
   } catch (error) {
     next(error)
   }
